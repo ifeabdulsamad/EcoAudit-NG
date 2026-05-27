@@ -1,88 +1,226 @@
 import { useAudit } from "../context/AuditContext.jsx";
 import { useNavigate } from "react-router-dom";
-import { formatNaira } from "../utils/formatters.js";
-import EnergyScoreMeter from "../components/dashboard/EnergyScoreMeter.jsx";
-import ConsumptionChart from "../components/dashboard/ConsumptionChart.jsx";
-import CarbonCard from "../components/dashboard/CarbonCard.jsx";
-import CostCard from "../components/dashboard/CostCard.jsx";
-import AIReport from "../components/dashboard/AIReport.jsx";
-import RecommendationCards from "../components/dashboard/RecommendationCards.jsx";
-import SolarVerdictCard from "../components/dashboard/SolarVerdictCard.jsx";
-import ExportButton from "../components/shared/ExportButton.jsx";
+import { motion } from "framer-motion";
+import { 
+  Zap, 
+  Wallet, 
+  Globe, 
+  Lightbulb, 
+  Sun, 
+  Brain,
+  ArrowRight,
+  Plus,
+  Download,
+  Building2,
+  MapPin,
+  TrendingDown,
+  Leaf
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { formatNaira } from "../lib/utils";
+import { useSolarVendors } from "../hooks/useSolarVendors";
+import EnergyScoreMeter from "../components/dashboard/EnergyScoreMeter";
+import ConsumptionChart from "../components/dashboard/ConsumptionChart";
+import CarbonCard from "../components/dashboard/CarbonCard";
+import CostCard from "../components/dashboard/CostCard";
+import AIReport from "../components/dashboard/AIReport";
+import RecommendationCards from "../components/dashboard/RecommendationCards";
+import SolarVerdictCard from "../components/dashboard/SolarVerdictCard";
+import ExportButton from "../components/shared/ExportButton";
 
-function ClipboardIcon() {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
+
+function EmptyState() {
+  const navigate = useNavigate();
+  const { reset } = useAudit();
+
   return (
-    <svg className="icon-svg icon-svg-xl accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="8" y="2" width="8" height="4" rx="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    </svg>
+    <div className="min-h-screen bg-zinc-950 pt-24 pb-16 flex items-center justify-center">
+      <div className="fixed inset-0 gradient-mesh opacity-30 pointer-events-none" />
+      
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 max-w-md mx-auto px-4"
+      >
+        <Card className="bg-zinc-900/80 backdrop-blur-xl border-zinc-800 text-center p-8">
+          <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+            <Zap className="w-10 h-10 text-emerald-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-3">No Audit Data Found</h2>
+          <p className="text-zinc-400 mb-8">
+            Complete an energy audit first to see your personalized dashboard with energy score, 
+            cost breakdown, and savings recommendations.
+          </p>
+          <Button 
+            size="lg" 
+            className="w-full group"
+            onClick={() => {
+              reset();
+              navigate("/audit");
+            }}
+          >
+            Start Your Audit
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </Card>
+      </motion.div>
+    </div>
   );
 }
 
-function ZapIcon() {
+function DashboardHeader({ auditData, auditResults }) {
+  const navigate = useNavigate();
+  const { reset } = useAudit();
+
   return (
-    <svg className="icon-svg icon-svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-    </svg>
+    <motion.div 
+      variants={itemVariants}
+      className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8"
+    >
+      <div>
+        <div className="flex items-center gap-3 mb-2">
+          <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+            <Leaf className="w-3 h-3 mr-1" />
+            Audit Complete
+          </Badge>
+          <span className="text-sm text-zinc-500">
+            {new Date().toLocaleDateString("en-NG", { 
+              weekday: "long", 
+              year: "numeric", 
+              month: "long", 
+              day: "numeric" 
+            })}
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+          Energy Audit <span className="text-emerald-400">Results</span>
+        </h1>
+        <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-400">
+          <div className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            <span className="capitalize">{auditData.businessType}</span>
+          </div>
+          <span className="text-zinc-700">|</span>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            <span>{auditData.location}</span>
+          </div>
+          <span className="text-zinc-700">|</span>
+          <div className="flex items-center gap-2">
+            <TrendingDown className="w-4 h-4 text-emerald-400" />
+            <span className="text-emerald-400">
+              {formatNaira(auditResults.recommendations?.reduce((sum, r) => sum + (r.savings || 0), 0) || 0)} potential savings
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap gap-3">
+        <ExportButton businessName={auditData.businessType} />
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            reset();
+            navigate("/audit");
+          }}
+        >
+          <Plus className="mr-2 w-4 h-4" />
+          New Audit
+        </Button>
+      </div>
+    </motion.div>
   );
 }
 
-function NairaIcon() {
-  return (
-    <svg className="icon-svg icon-svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 6v12" />
-      <path d="M18 6v12" />
-      <path d="M4 10h16" />
-      <path d="M4 14h16" />
-    </svg>
-  );
-}
+function StatCards({ auditResults }) {
+  const stats = [
+    {
+      icon: Zap,
+      label: "Annual Consumption",
+      value: `${auditResults.totalAnnualKwh.toLocaleString()}`,
+      unit: "kWh",
+      color: "emerald",
+      gradient: "from-emerald-400 to-emerald-600"
+    },
+    {
+      icon: Wallet,
+      label: "Total Annual Cost",
+      value: formatNaira(auditResults.totalAnnualCost),
+      unit: "",
+      color: "cyan",
+      gradient: "from-cyan-400 to-cyan-600"
+    },
+    {
+      icon: Globe,
+      label: "CO₂ Emissions",
+      value: (auditResults.totalAnnualCo2 / 1000).toFixed(1),
+      unit: "tonnes/year",
+      color: "rose",
+      gradient: "from-rose-400 to-rose-600"
+    }
+  ];
 
-function GlobeIcon() {
   return (
-    <svg className="icon-svg icon-svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M2 12h20" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
+    <motion.div 
+      variants={itemVariants}
+      className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+    >
+      {stats.map((stat, i) => (
+        <Card key={i} className="glass-card-hover group">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-zinc-500 mb-1">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                    {stat.value}
+                  </span>
+                  {stat.unit && (
+                    <span className="text-sm text-zinc-500">{stat.unit}</span>
+                  )}
+                </div>
+              </div>
+              <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <stat.icon className={`w-6 h-6 text-${stat.color}-400`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </motion.div>
   );
 }
 
 export default function Dashboard() {
   const { auditResults, auditData, reset } = useAudit();
   const navigate = useNavigate();
+  
+  // Fetch fresh solar vendor data
+  const { 
+    solarData, 
+    loading: solarLoading, 
+    isFresh, 
+    isFallback,
+    refresh 
+  } = useSolarVendors(auditResults);
 
   if (!auditResults) {
-    return (
-      <div className="dashboard-empty page">
-        <div className="empty-state">
-          <div className="empty-state-icon">
-            <ClipboardIcon />
-          </div>
-          <h2>No audit data found</h2>
-          <p>Complete an energy audit first to see your dashboard.</p>
-          <button
-            className="btn-primary btn-large"
-            onClick={() => {
-              reset();
-              navigate("/audit");
-            }}
-          >
-            Start Audit
-            <ArrowRightIcon />
-          </button>
-        </div>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   const {
@@ -95,114 +233,81 @@ export default function Dashboard() {
     carbonComparisons,
     effectiveMonthlyFuelCost,
     auditSummary,
-    solarData,
   } = auditResults;
 
-  const tonnesCo2 = (totalAnnualCo2 / 1000).toFixed(1);
-
   return (
-    <div className="dashboard-page page" id="dashboard-content">
-      <div className="dashboard-header">
-        <div className="dashboard-title-area">
-          <h1 className="dashboard-title">Energy Audit Results</h1>
-          <p className="dashboard-subtitle">
-            <span className="icon-svg icon-svg-sm" style={{ color: "var(--text-muted)" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
-                <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
-                <path d="M12 3v6" />
-              </svg>
-            </span>
-            {auditData.businessType}
-            <span className="dashboard-subtitle-sep">|</span>
-            {auditData.location}
-          </p>
-        </div>
-        <div className="dashboard-actions">
-          <ExportButton businessName={auditData.businessType} />
-          <button
-            className="btn-secondary"
-            onClick={() => {
-              reset();
-              navigate("/");
-            }}
-          >
-            <PlusIcon />
-            New Audit
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-zinc-950 pt-24 pb-16">
+      {/* Background effects */}
+      <div className="fixed inset-0 gradient-mesh opacity-30 pointer-events-none" />
+      <div className="fixed inset-0 mesh-bg opacity-20 pointer-events-none" />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="dashboard-content">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <DashboardHeader auditData={auditData} auditResults={auditResults} />
+          
+          <StatCards auditResults={auditResults} />
 
-      {/* Hero Summary Bar */}
-      <div className="dashboard-hero">
-        <div className="hero-stat">
-          <div className="hero-stat-icon">
-            <ZapIcon />
+          {/* Disclaimer */}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="flex items-center gap-2 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-sm text-zinc-400">
+                Estimates based on standard appliance ratings and Nigerian grid averages. 
+                Actual costs may vary based on specific usage patterns and local conditions.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Main Dashboard Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column - Score & Cost */}
+            <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
+              <EnergyScoreMeter score={score} />
+              <CostCard
+                annualCost={totalAnnualCost}
+                monthlyFuelCost={effectiveMonthlyFuelCost}
+                gridHoursPerDay={auditSummary.gridHoursPerDay}
+                genHoursPerDay={auditSummary.genHoursPerDay}
+              />
+            </motion.div>
+
+            {/* Middle Column - Carbon & Chart */}
+            <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
+              <CarbonCard totalCo2={totalAnnualCo2} comparisons={carbonComparisons} />
+            </motion.div>
+
+            {/* Right Column - Recommendations */}
+            <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
+              <RecommendationCards recommendations={recommendations} />
+            </motion.div>
+
+            {/* Full Width - Consumption Chart */}
+            <motion.div variants={itemVariants} className="lg:col-span-8">
+              <ConsumptionChart applianceResults={applianceResults} />
+            </motion.div>
+
+            {/* Solar Verdict */}
+            <motion.div variants={itemVariants} className="lg:col-span-4">
+              <SolarVerdictCard 
+                solarData={solarData} 
+                loading={solarLoading}
+                isFresh={isFresh}
+                isFallback={isFallback}
+                onRefresh={refresh}
+              />
+            </motion.div>
+
+            {/* Full Width - AI Report */}
+            <motion.div variants={itemVariants} className="lg:col-span-12">
+              <AIReport auditResults={auditResults} />
+            </motion.div>
           </div>
-          <span className="hero-stat-value gradient-green">{totalAnnualKwh.toLocaleString()}</span>
-          <span className="hero-stat-label">kWh / Year Consumption</span>
-        </div>
-        <div className="hero-stat">
-          <div className="hero-stat-icon">
-            <NairaIcon />
-          </div>
-          <span className="hero-stat-value gradient-cyan">{formatNaira(totalAnnualCost)}</span>
-          <span className="hero-stat-label">Total Annual Cost</span>
-        </div>
-        <div className="hero-stat">
-          <div className="hero-stat-icon">
-            <GlobeIcon />
-          </div>
-          <span className="hero-stat-value gradient-red">{tonnesCo2} t</span>
-          <span className="hero-stat-label">CO&#8322; Emissions / Year</span>
-        </div>
-      </div>
-
-      <div className="dashboard-disclaimer">
-        Estimates based on standard appliance ratings and Nigerian grid averages.
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="grid-item score-area">
-          <EnergyScoreMeter score={score} />
-        </div>
-        <div className="grid-item cost-area">
-          <CostCard
-            annualCost={totalAnnualCost}
-            monthlyFuelCost={effectiveMonthlyFuelCost}
-            gridHoursPerDay={auditSummary.gridHoursPerDay}
-            genHoursPerDay={auditSummary.genHoursPerDay}
-          />
-        </div>
-        <div className="grid-item carbon-area">
-          <CarbonCard totalCo2={totalAnnualCo2} comparisons={carbonComparisons} />
-        </div>
-
-        <div className="grid-item chart-area">
-          <ConsumptionChart applianceResults={applianceResults} />
-        </div>
-
-        <div className="grid-item recs-area">
-          <RecommendationCards recommendations={recommendations} />
-        </div>
-
-        <div className="grid-item solar-area">
-          <SolarVerdictCard solarData={solarData} />
-        </div>
-
-        <div className="grid-item report-area">
-          <AIReport auditResults={auditResults} />
-        </div>
+        </motion.div>
       </div>
     </div>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
   );
 }

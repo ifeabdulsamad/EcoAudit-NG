@@ -1,27 +1,8 @@
-import { formatNaira } from "../../utils/formatters.js";
-
-function NairaIcon() {
-  return (
-    <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 6v12" />
-      <path d="M18 6v12" />
-      <path d="M4 10h16" />
-      <path d="M4 14h16" />
-    </svg>
-  );
-}
-
-function GridIcon() {
-  return (
-    <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <path d="M3 9h18" />
-      <path d="M3 15h18" />
-      <path d="M9 3v18" />
-      <path d="M15 3v18" />
-    </svg>
-  );
-}
+import { motion } from "framer-motion";
+import { Wallet, TrendingUp, Zap, Battery } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { formatNaira } from "../../lib/utils";
 
 export default function CostCard({ annualCost, monthlyFuelCost, gridHoursPerDay, genHoursPerDay }) {
   const totalHours = gridHoursPerDay + genHoursPerDay;
@@ -30,55 +11,110 @@ export default function CostCard({ annualCost, monthlyFuelCost, gridHoursPerDay,
   const monthlyCost = annualCost / 12;
 
   return (
-    <div className="dashboard-card cost-card">
-      <div className="card-header">
-        <div className="card-icon">
-          <NairaIcon />
+    <Card className="glass-card-hover">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+            <Wallet className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div>
+            <CardTitle className="text-lg">Annual Energy Cost</CardTitle>
+            <CardDescription>Total estimated spend</CardDescription>
+          </div>
         </div>
-        <h3 className="card-title">Annual Energy Cost</h3>
-      </div>
-      <div className="cost-main">
-        <span className="cost-value">{formatNaira(annualCost)}</span>
-        <span className="cost-sub">per year (estimated)</span>
-      </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        {/* Main Cost */}
+        <div className="text-center py-4">
+          <motion.div 
+            className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {formatNaira(annualCost)}
+          </motion.div>
+          <p className="text-sm text-zinc-500 mt-1">per year (estimated)</p>
+        </div>
 
-      <div className="cost-breakdown">
-        <div className="cost-row">
-          <span className="cost-label">Monthly average</span>
-          <span className="cost-amount">{formatNaira(monthlyCost)}</span>
+        {/* Breakdown */}
+        <div className="space-y-3 pt-4 border-t border-zinc-800">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-zinc-400">Monthly average</span>
+            <span className="text-sm font-medium text-white">{formatNaira(monthlyCost)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-zinc-400">Monthly fuel spend</span>
+            <span className="text-sm font-medium text-amber-400">{formatNaira(monthlyFuelCost)}</span>
+          </div>
         </div>
-        <div className="cost-row">
-          <span className="cost-label">Monthly fuel spend</span>
-          <span className="cost-amount">{formatNaira(monthlyFuelCost)}</span>
-        </div>
-      </div>
 
-      <div className="cost-split">
-        <div className="cost-split-header">
-          <GridIcon />
-          <span>Grid vs Generator (by hours)</span>
+        {/* Grid vs Generator Split */}
+        <div className="pt-4 border-t border-zinc-800">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-4 h-4 text-zinc-500" />
+            <span className="text-sm font-medium text-zinc-300">Power Source Split</span>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="h-3 bg-zinc-800 rounded-full overflow-hidden flex">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-cyan-500 to-cyan-600"
+              initial={{ width: 0 }}
+              animate={{ width: `${gridPct}%` }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            />
+            <motion.div 
+              className="h-full bg-gradient-to-r from-amber-500 to-amber-600"
+              initial={{ width: 0 }}
+              animate={{ width: `${genPct}%` }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            />
+          </div>
+          
+          {/* Legend */}
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-cyan-500" />
+              <span className="text-sm text-zinc-400">Grid {gridPct}%</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-amber-500" />
+              <span className="text-sm text-zinc-400">Generator {genPct}%</span>
+            </div>
+          </div>
         </div>
-        <div className="split-bar">
-          <div
-            className="split-segment grid"
-            style={{ width: `${gridPct}%` }}
-            title={`Grid: ${gridPct}%`}
-          />
-          <div
-            className="split-segment gen"
-            style={{ width: `${genPct}%` }}
-            title={`Generator: ${genPct}%`}
-          />
+
+        {/* Savings hint */}
+        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+          <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <p className="text-sm text-emerald-300">
+            Potential savings identified in recommendations below
+          </p>
         </div>
-        <div className="split-labels">
-          <span className="split-label">
-            <span className="dot dot-grid" /> Grid {gridPct}%
-          </span>
-          <span className="split-label">
-            <span className="dot dot-gen" /> Generator {genPct}%
-          </span>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Clock icon for generator hours
+function Clock(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
   );
 }

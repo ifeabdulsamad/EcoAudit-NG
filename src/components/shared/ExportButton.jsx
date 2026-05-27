@@ -1,13 +1,20 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Download, Loader2, Check, FileText } from "lucide-react";
+import { Button } from "../ui/button";
 import { exportPdf } from "../../utils/pdfExport.js";
 
 export default function ExportButton({ businessName }) {
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleExport = async () => {
     setLoading(true);
+    setSuccess(false);
     try {
       await exportPdf("dashboard-content", businessName);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.warn("Export failed:", err.message);
     } finally {
@@ -16,26 +23,48 @@ export default function ExportButton({ businessName }) {
   };
 
   return (
-    <button
-      className="export-btn"
+    <Button
+      variant="outline"
       onClick={handleExport}
       disabled={loading}
+      className="relative overflow-hidden"
     >
-      {loading ? (
-        <>
-          <span className="spinner" />
-          Generating PDF…
-        </>
-      ) : (
-        <>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Export PDF
-        </>
-      )}
-    </button>
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center"
+          >
+            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+            Generating PDF...
+          </motion.div>
+        ) : success ? (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center text-emerald-400"
+          >
+            <Check className="mr-2 w-4 h-4" />
+            Downloaded!
+          </motion.div>
+        ) : (
+          <motion.div
+            key="default"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center"
+          >
+            <Download className="mr-2 w-4 h-4" />
+            Export PDF
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Button>
   );
 }

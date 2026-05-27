@@ -1,85 +1,155 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAudit } from "../../context/AuditContext.jsx";
+import { 
+  Leaf, 
+  Home, 
+  ClipboardList, 
+  BarChart3, 
+  Menu, 
+  X 
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Button } from "../ui/button";
 
-function LeafIcon() {
-  return (
-    <svg className="icon-svg icon-svg-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z" />
-      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-    </svg>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg className="icon-svg icon-svg-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-
-function ClipboardIcon() {
-  return (
-    <svg className="icon-svg icon-svg-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="8" y="2" width="8" height="4" rx="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    </svg>
-  );
-}
-
-function BarChartIcon() {
-  return (
-    <svg className="icon-svg icon-svg-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
-    </svg>
-  );
-}
+const navItems = [
+  { path: "/", label: "Home", icon: Home },
+  { path: "/audit", label: "Audit", icon: ClipboardList },
+];
 
 export default function Navbar() {
   const { auditResults } = useAudit();
+  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const allNavItems = auditResults 
+    ? [...navItems, { path: "/dashboard", label: "Dashboard", icon: BarChart3 }]
+    : navItems;
 
   return (
-    <nav className="navbar">
-      <div className="navbar-inner">
-        <NavLink to="/" className="navbar-brand">
-          <LeafIcon />
-          <span className="navbar-brand-text">
-            EcoAudit <span className="accent">NG</span>
-          </span>
-        </NavLink>
-
-        <div className="navbar-links">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => `navbar-link ${isActive ? "active" : ""}`}
-          >
-            <HomeIcon />
-            <span className="navbar-link-label">Home</span>
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? "bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50" 
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <NavLink to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+              <Leaf className="w-4 h-4 text-emerald-400" />
+            </div>
+            <span className="text-lg font-bold text-white">
+              EcoAudit <span className="text-emerald-400">NG</span>
+            </span>
           </NavLink>
 
-          <NavLink
-            to="/audit"
-            className={({ isActive }) => `navbar-link ${isActive ? "active" : ""}`}
-          >
-            <ClipboardIcon />
-            <span className="navbar-link-label">Audit</span>
-          </NavLink>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            {allNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    isActive 
+                      ? "text-emerald-400 bg-emerald-500/10" 
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute bottom-0 left-4 right-4 h-0.5 bg-emerald-500 rounded-full"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
 
-          {auditResults && (
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) => `navbar-link ${isActive ? "active" : ""}`}
-            >
-              <BarChartIcon />
-              <span className="navbar-link-label">Dashboard</span>
+          {/* CTA Button */}
+          <div className="hidden md:block">
+            <NavLink to="/audit">
+              <Button 
+                size="sm" 
+                className={location.pathname === "/audit" ? "opacity-0 pointer-events-none" : ""}
+              >
+                Start Audit
+              </Button>
             </NavLink>
-          )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800/50"
+          >
+            <div className="px-4 py-4 space-y-2">
+              {allNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isActive 
+                        ? "text-emerald-400 bg-emerald-500/10" 
+                        : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                  </NavLink>
+                );
+              })}
+              <div className="pt-2 border-t border-zinc-800">
+                <NavLink to="/audit" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full">Start Audit</Button>
+                </NavLink>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }
