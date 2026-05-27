@@ -4,7 +4,20 @@
  * Falls back to embedded data if fetch fails
  */
 
-import { solarPackages as fallbackVendors } from "../data/solarPackages";
+// Fallback vendor data from local engine
+import { SOLAR_MERCHANTS } from "../engine/solarMerchants.js";
+
+// Flatten merchant packages into a single array for fallback
+const fallbackVendors = SOLAR_MERCHANTS.flatMap(merchant => 
+  merchant.packages.map(pkg => ({
+    ...pkg,
+    merchantName: merchant.name,
+    merchantTagline: merchant.tagline,
+    merchantWebsite: merchant.website,
+    merchantPhone: merchant.phone,
+    merchantEmail: merchant.email,
+  }))
+);
 
 // Configuration
 const CONFIG = {
