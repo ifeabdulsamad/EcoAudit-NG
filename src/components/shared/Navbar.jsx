@@ -2,7 +2,6 @@ import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudit } from "../../context/AuditContext.jsx";
 import { 
-  Leaf, 
   Home, 
   ClipboardList, 
   BarChart3, 
@@ -50,8 +49,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-              <Leaf className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+              <img src="/favicon.svg" alt="EcoAudit NG" className="w-5 h-5" />
             </div>
             <span className="text-lg font-bold text-white">
               EcoAudit <span className="text-emerald-400">NG</span>
