@@ -49,7 +49,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-400 flex items-center justify-center">
               <img src="/favicon.svg" alt="EcoAudit NG" className="w-5 h-5" />
             </div>
             <span className="text-lg font-bold text-white">
