@@ -741,12 +741,6 @@ function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
 
-
-
-
-             // <Leaf className="w-6 h-6 text-emerald-400" />
-
-
             <div className="w-8 h-8 rounded-lg bg-emerald-400 flex items-center justify-center">
               <img src="/favicon.svg" alt="EcoAudit NG" className="w-5 h-5" />
             </div>
