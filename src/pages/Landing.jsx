@@ -416,7 +416,7 @@ function PainPointsSection() {
       icon: TrendingDown,
       title: "Shrinking Margins",
       description:
-        "Energy costs can represent 20-40% of operating expenses for SMEs.",
+        "Energy costs can consume up to 60% of SME profits in Nigeria, nearly double previous levels",
     },
   ];
 
