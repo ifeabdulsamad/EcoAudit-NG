@@ -141,11 +141,11 @@ function HeroSection() {
           </motion.div>
 
           {/* Stats */}
-          <motion.div
+          {/* <motion.div
             variants={fadeInUp}
             className="grid grid-cols-3 gap-8 max-w-lg mx-auto"
           >
-            /* {[
+             {[
               { value: "2,500+", label: "Audits Completed" },
               { value: "₦180M", label: "Customer Savings" },
               { value: "4.9/5", label: "User Rating" },
@@ -156,8 +156,8 @@ function HeroSection() {
                 </div>
                 <div className="text-sm text-zinc-500">{stat.label}</div>
               </div>
-            ))} */
-          </motion.div>
+            ))} 
+          </motion.div> */}
         </motion.div>
 
         {/* Dashboard Preview Mockup */}
