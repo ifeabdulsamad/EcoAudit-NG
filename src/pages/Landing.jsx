@@ -762,7 +762,7 @@ function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://x.com/Ife_abdulsamad"
+                href="https://x.com/EcoauditNG"
                 className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-400 hover:bg-zinc-700 transition-colors"
               >
                 <svg
@@ -774,7 +774,7 @@ function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/company/ecoauditng"
                 className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-400 hover:bg-zinc-700 transition-colors"
               >
                 <svg
@@ -835,7 +835,7 @@ function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-zinc-400">
                 <Mail className="w-4 h-4" />
-                hello@ecoaudit.ng
+                ecoauditng.gmail.com
               </li>
               <li className="flex items-center gap-2 text-zinc-400">
                 <Phone className="w-4 h-4" />
@@ -843,7 +843,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2 text-zinc-400">
                 <MapPin className="w-4 h-4" />
-                UNILORIN, Nigeria
+                Abuja, Nigeria
               </li>
             </ul>
           </div>
