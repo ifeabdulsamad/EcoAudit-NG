@@ -578,30 +578,30 @@ function SolarShowcaseSection() {
 }
 
 // Testimonials Section
-// function TestimonialsSection() {
-//  const testimonials = [
-  //  {
+ /* function TestimonialsSection() {
+  const testimonials = [
+    {
       quote:
         "EcoAudit helped us identify that our old freezer was costing us ₦45,000 monthly. We replaced it and saved 30% on our energy bill.",
       author: "Chioma Okafor",
       role: "Restaurant Owner, Lagos",
       rating: 5,
     },
- //   {
-   //   quote:
-    //    "The solar recommendation was spot on. We installed a 5kW system and reduced our generator use from 12 hours to 3 hours daily.",
-    //  author: "Emmanuel Adeyemi",
-   //   role: "Pharmacy Owner, Ibadan",
-   //   rating: 5,
+    {
+     quote:
+        "The solar recommendation was spot on. We installed a 5kW system and reduced our generator use from 12 hours to 3 hours daily.",
+      author: "Emmanuel Adeyemi",
+      role: "Pharmacy Owner, Ibadan",
+      rating: 5,
     },
-  //  {
+    {
       quote:
         "Finally, a tool that understands Nigerian business realities. The audit was quick and the recommendations actually made sense.",
       author: "Fatima Ibrahim",
       role: "Salon Owner, Abuja",
       rating: 5,
     },
-  ];
+  ]; */
 
   return (
     <section className="py-24 relative">
