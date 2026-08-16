@@ -579,7 +579,7 @@ function SolarShowcaseSection() {
 
 // Testimonials Section
 // function TestimonialsSection() {
-  const testimonials = [
+//  const testimonials = [
     {
       quote:
         "EcoAudit helped us identify that our old freezer was costing us ₦45,000 monthly. We replaced it and saved 30% on our energy bill.",
