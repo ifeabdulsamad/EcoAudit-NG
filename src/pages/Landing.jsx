@@ -588,11 +588,11 @@ function SolarShowcaseSection() {
       rating: 5,
     },
  //   {
-      quote:
-        "The solar recommendation was spot on. We installed a 5kW system and reduced our generator use from 12 hours to 3 hours daily.",
-      author: "Emmanuel Adeyemi",
-      role: "Pharmacy Owner, Ibadan",
-      rating: 5,
+   //   quote:
+    //    "The solar recommendation was spot on. We installed a 5kW system and reduced our generator use from 12 hours to 3 hours daily.",
+    //  author: "Emmanuel Adeyemi",
+   //   role: "Pharmacy Owner, Ibadan",
+   //   rating: 5,
     },
   //  {
       quote:
