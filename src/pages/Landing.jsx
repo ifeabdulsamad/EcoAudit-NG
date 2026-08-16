@@ -578,7 +578,7 @@ function SolarShowcaseSection() {
 }
 
 // Testimonials Section
-function TestimonialsSection() {
+// function TestimonialsSection() {
   const testimonials = [
     {
       quote:
